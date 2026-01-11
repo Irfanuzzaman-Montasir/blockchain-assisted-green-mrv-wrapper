@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv/
+venv/
+
+# Packaging
+dist/
+build/
+*.egg-info/
+
+# MRV outputs (do not commit experiment artifacts)
+mrv_records/
+*.csv
+
+# OS
+.DS_Store
+Thumbs.db

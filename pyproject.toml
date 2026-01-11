@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "greenmrv"
+version = "0.1.0"
+description = "MRV wrapper for ML workloads (JSON generation only)."
+requires-python = ">=3.9"
+dependencies = [
+  "codecarbon>=2.0.0",
+  "psutil>=5.9.0",
+  "py-cpuinfo>=9.0.0"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

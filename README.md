@@ -53,21 +53,112 @@ MRV-<uuid>_codecarbon.csv
 - Python **3.9+**
 - Works in: VS Code / local machine / Google Colab
 
-### Install dependencies
-In your environment:
+# If you want more precise
 
-## bash
-```pip install codecarbon psutil py-cpuinfo```
+# Blockchain-Assisted-MRV
 
-## Optional (for better NVIDIA GPU detection):
+## Setup Instructions
 
-```pip install pynvml```
+Follow the steps below to clone the repository and install the required dependencies.
 
-### Install this package (editable mode)
+---
 
-From the project root:
+## Step 1: Clone the Repository
 
-```pip install -e . ```
+```bash
+git clone https://github.com/Irfanuzzaman-Montasir/blockchain-assisted-green-mrv-wrapper.git
+cd blockchain-assisted-green-mrv-wrapper
+```
+
+> ⚠️ **PowerShell note**: If `blockchain-assisted-green-mrv-wrapper` causes issues, use:
+>
+> ```powershell
+> cd .\blockchain-assisted-green-mrv-wrapper
+> ```
+>
+> Or rename the folder:
+>
+> ```powershell
+> Rename-Item "-Blockchain-Assisted-MRV" "Blockchain-Assisted-MRV"
+> cd Blockchain-Assisted-MRV
+> ```
+
+---
+
+## Step 2: Install Required Python Packages
+
+Make sure you have Python 3 installed and `pip` available.
+
+```bash
+pip install codecarbon psutil py-cpuinfo
+```
+
+---
+
+## Step 3: Install the Project in Editable Mode
+
+From the project root directory:
+
+```bash
+pip install -e .
+```
+
+This installs the project in editable (development) mode.
+
+---
+
+## Troubleshooting (Step 2 or Step 3 Errors)
+
+If you encounter SSL or certificate-related errors (for example, referencing `C:\cacert.pem`), follow the steps below.
+
+### 1️⃣ Check if SSL / certificate environment variables are set
+
+Run the following commands in **PowerShell**:
+
+```powershell
+echo $env:SSL_CERT_FILE
+echo $env:REQUESTS_CA_BUNDLE
+```
+
+If either command prints:
+
+```
+C:\cacert.pem
+```
+
+then this is causing the issue.
+
+---
+
+### 2️⃣ Remove the problematic variables (current session only)
+
+```powershell
+Remove-Item Env:SSL_CERT_FILE -ErrorAction SilentlyContinue
+Remove-Item Env:REQUESTS_CA_BUNDLE -ErrorAction SilentlyContinue
+```
+
+After removing them, retry:
+
+```bash
+pip install codecarbon psutil py-cpuinfo
+pip install -e .
+```
+
+---
+
+## Notes
+
+* These environment variable changes apply **only to the current PowerShell session**.
+* If the problem persists across sessions, check your system environment variables or `pip config list`.
+
+---
+
+## ✅ Setup Complete
+
+You should now be able to run and modify the project successfully.
+
+If you face further issues, please open an issue or contact the main
+
 
 ### Now just run the code in Examples files using the wrapper
 
@@ -80,11 +171,4 @@ From the project root:
 ## Example run
 Run the included demo:
 python examples/demo_train.py
-
-
-## Expected output:
-
-[greenmrv] MRV ID: MRV-...
-[greenmrv] MRV JSON saved: .../mrv_records/MRV-....json
-[greenmrv] CodeCarbon CSV: .../mrv_records/MRV-...._codecarbon.csv
 

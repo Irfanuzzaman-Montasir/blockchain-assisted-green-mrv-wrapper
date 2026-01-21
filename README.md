@@ -46,6 +46,41 @@ pip install codecarbon psutil py-cpuinfo web3 py-solc-x streamlit
 pip install -e .
 ```
 
+### 4. Install Solidity Compiler (One-time setup)
+You must install the specific `solc` version used by the wrapper. Run this Python snippet once:
+
+```python
+from solcx import install_solc
+install_solc("0.8.17")
+exit()
+```
+
+---
+
+## Installation Troubleshooting
+
+If you encounter errors during **Step 2** or **Step 3** (especially SSL/Certificate errors), it is likely due to conflicting environment variables.
+
+**1. Check if SSL/certificate environment variables are set:**
+
+Run in PowerShell:
+```powershell
+echo $env:SSL_CERT_FILE
+echo $env:REQUESTS_CA_BUNDLE
+```
+
+If either command output points to a file like `C:\cacert.pem`, that is likely the culprit.
+
+**2. Remove them for the current session:**
+
+Run in PowerShell:
+```powershell
+Remove-Item Env:SSL_CERT_FILE -ErrorAction SilentlyContinue
+Remove-Item Env:REQUESTS_CA_BUNDLE -ErrorAction SilentlyContinue
+```
+
+After running these commands, try the `pip install` steps again in the same terminal window.
+
 ---
 
 ## Usage
@@ -64,14 +99,6 @@ You can wrap your training loop with `mrv_run`. See `examples/train_dummy_model.
 python examples/train_dummy_model.py
 ```
 
-**What happens?**
-1.  The wrapper connects to Ganache and deploys a new `MRVRegistry` Smart Contract (for this run).
-2.  It tracks energy usage during the training.
-3.  After training, it saves the **MRV JSON** to `mrv_records/`.
-4.  It computes the SHA-256 hash of the record.
-5.  It sends a transaction to Ganache to register the hash.
-6.  The final JSON includes the **Transaction Hash** and **Contract Address**.
-
 ### 3. Verify the Record
 To verify that an MRV record hasn't been tampered with, use the included Streamlit app.
 
@@ -82,6 +109,31 @@ streamlit run src/greenmrv/verify_streamlit.py
 *   Upload the generated JSON file from `mrv_records/`.
 *   Enter the `mrv_id` (found inside the JSON or printed in the console).
 *   The app will recompute the hash and check the blockchain to ensure it matches.
+
+---
+
+## Example Output (MRV JSON)
+
+When a run completes, the wrapper generates a JSON file like this:
+
+```json
+{
+  "schema_version": "0.1",
+  "mrv_id": "MRV-XXXX",
+  "experiment": { ... },
+  "training": { ... },
+  "hardware": { ... },
+  "energy_emissions": { ... },
+  "timestamps": { ... },
+  "integrity": {
+    "hash_alg": "sha256",
+    "json_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "blockchain_network": "ganache-local",
+    "contract_address": "0x123...",
+    "tx_hash": "0xabc..."
+  }
+}
+```
 
 ---
 

@@ -32,5 +32,8 @@ def detect_framework() -> FrameworkInfo:
 
     if _pkg_installed("jax"):
         return FrameworkInfo("JAX", _pkg_version("jax") or "unknown")
+    
+    if _pkg_installed("numpy"):
+        return FrameworkInfo("numpy", _pkg_version("numpy") or "unknown")
 
     return FrameworkInfo("unknown", "unknown")

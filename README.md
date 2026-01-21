@@ -1,174 +1,113 @@
-# Blockchain-Assisted Green MRV Wrapper (Python Wrapper - v0.1)
+# Blockchain-Assisted Green MRV Wrapper
 
-A lightweight Python wrapper for **Measurement–Reporting–Verification (MRV)** of Machine Learning workloads.
+A lightweight Python wrapper for **Measurement–Reporting–Verification (MRV)** of Machine Learning workloads. 
 
-This repository currently implements **Part 1 (Python wrapper)**:
-- Wraps any training code (PyTorch/TensorFlow/JAX or anything)
-- Uses **CodeCarbon** to measure energy consumption and CO₂ emissions
-- Auto-collects hardware metadata (CPU/RAM/GPU if available)
-- Auto-detects ML framework + version
-- Generates a standardized **MRV JSON** record and saves it to a file
+This tool measures the energy consumption and CO₂ emissions of any ML training script, generates a standardized **MRV JSON** record, and **anchors the record's integrity hash on a local Ethereum blockchain (Ganache)**.
 
-> ✅ Next update (later): canonical hashing + blockchain anchoring (immutable proof).
+## Features
 
----
-
-## Why this project exists
-
-Current ML carbon reporting is often:
-- self-reported
-- stored locally (mutable)
-- not independently verifiable
-
-This project moves toward **verifiable ML sustainability reporting** by producing a standardized MRV record that can later be hashed and anchored on-chain.
+- **Universal Wrapper**: Works with PyTorch, TensorFlow, JAX, or any Python code.
+- **Automated Tracking**: Uses [CodeCarbon](https://codecarbon.io/) to measure hardware energy usage (GPU/CPU/RAM).
+- **Auto-Detection**: Automatically detects ML frameworks, hardware specs, and library versions.
+- **Blockchain Anchoring**: Computes a canonical SHA-256 hash of the MRV record and registers it on a local blockchain (Ganache) to prove integrity.
+- **Verification UI**: Includes a Streamlit app to verify that an MRV JSON file matches its on-chain record.
 
 ---
 
-## What the wrapper does (current version)
+## Prerequisites
 
-### Workflow
-1. User runs Python training code
-2. Wrapper starts CodeCarbon tracking
-3. Training runs normally
-4. Wrapper stops tracking
-5. Wrapper generates an MRV JSON file
-6. Wrapper saves MRV JSON to disk
-
-### Output files
-After running, you will get:
-
-mrv_records/
-MRV-<uuid>.json
-MRV-<uuid>_codecarbon.csv
-
-
-- `MRV-<uuid>.json` = standardized MRV record (main artifact)
-- `MRV-<uuid>_codecarbon.csv` = raw CodeCarbon output (for audit / parsing energy_kwh)
+1.  **Python 3.9+**
+2.  **Ganache** (for local blockchain simulation)
+    *   Download [Ganache UI](https://trufflesuite.com/ganache/)
+    *   **OR** install Ganache CLI: `npm install -g ganache`
 
 ---
 
 ## Installation
 
-### Requirements
-- Python **3.9+**
-- Works in: VS Code / local machine / Google Colab
-
-# If you want more precise
-
-# Blockchain-Assisted-MRV
-
-## Setup Instructions
-
-Follow the steps below to clone the repository and install the required dependencies.
-
----
-
-## Step 1: Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/Irfanuzzaman-Montasir/blockchain-assisted-green-mrv-wrapper.git
 cd blockchain-assisted-green-mrv-wrapper
 ```
 
-> ⚠️ **PowerShell note**: If `blockchain-assisted-green-mrv-wrapper` causes issues, use:
->
-> ```powershell
-> cd .\blockchain-assisted-green-mrv-wrapper
-> ```
->
-> Or rename the folder:
->
-> ```powershell
-> Rename-Item "-Blockchain-Assisted-MRV" "Blockchain-Assisted-MRV"
-> cd Blockchain-Assisted-MRV
-> ```
+### 2. Install dependencies
 
----
-
-## Step 2: Install Required Python Packages
-
-Make sure you have Python 3 installed and `pip` available.
+Install the required Python packages:
 
 ```bash
-pip install codecarbon psutil py-cpuinfo
+pip install codecarbon psutil py-cpuinfo web3 py-solc-x streamlit
 ```
 
----
-
-## Step 3: Install the Project in Editable Mode
-
-From the project root directory:
+### 3. Install the package in editable mode
 
 ```bash
 pip install -e .
 ```
 
-This installs the project in editable (development) mode.
-
 ---
 
-## Troubleshooting (Step 2 or Step 3 Errors)
+## Usage
 
-If you encounter SSL or certificate-related errors (for example, referencing `C:\cacert.pem`), follow the steps below.
+### 1. Start Ganache
+Before running any code, you must have a local Ganache blockchain running.
 
-### 1️⃣ Check if SSL / certificate environment variables are set
+*   **GUI**: Open Ganache and click "Quickstart". Ensure it is running on `http://127.0.0.1:7545`.
+*   **CLI**: Run `ganache-cli -p 7545` (or just `ganache`).
 
-Run the following commands in **PowerShell**:
+### 2. Run an Experiment
+You can wrap your training loop with `mrv_run`. See `examples/train_dummy_model.py` for a complete example.
 
-```powershell
-echo $env:SSL_CERT_FILE
-echo $env:REQUESTS_CA_BUNDLE
+**Run the example:**
+```bash
+python examples/train_dummy_model.py
 ```
 
-If either command prints:
+**What happens?**
+1.  The wrapper connects to Ganache and deploys a new `MRVRegistry` Smart Contract (for this run).
+2.  It tracks energy usage during the training.
+3.  After training, it saves the **MRV JSON** to `mrv_records/`.
+4.  It computes the SHA-256 hash of the record.
+5.  It sends a transaction to Ganache to register the hash.
+6.  The final JSON includes the **Transaction Hash** and **Contract Address**.
 
-```
-C:\cacert.pem
-```
-
-then this is causing the issue.
-
----
-
-### 2️⃣ Remove the problematic variables (current session only)
-
-```powershell
-Remove-Item Env:SSL_CERT_FILE -ErrorAction SilentlyContinue
-Remove-Item Env:REQUESTS_CA_BUNDLE -ErrorAction SilentlyContinue
-```
-
-After removing them, retry:
+### 3. Verify the Record
+To verify that an MRV record hasn't been tampered with, use the included Streamlit app.
 
 ```bash
-pip install codecarbon psutil py-cpuinfo
-pip install -e .
+streamlit run src/greenmrv/verify_streamlit.py
 ```
 
----
-
-## Notes
-
-* These environment variable changes apply **only to the current PowerShell session**.
-* If the problem persists across sessions, check your system environment variables or `pip config list`.
+*   Upload the generated JSON file from `mrv_records/`.
+*   Enter the `mrv_id` (found inside the JSON or printed in the console).
+*   The app will recompute the hash and check the blockchain to ensure it matches.
 
 ---
 
-## ✅ Setup Complete
+## Project Structure
 
-You should now be able to run and modify the project successfully.
+*   `src/greenmrv`: Core package source code.
+    *   `core.py`: Main logic for the wrapper.
+    *   `blockchain_ganache.py`: Handles Ganache connection and contract validation.
+    *   `verify_streamlit.py`: Verification UI.
+    *   `ganache_chain/`: Contains the Solidity Smart Contract (`MRVRegistry.sol`).
+*   `examples`: Example scripts showing how to use the wrapper.
+*   `mrv_records`: Output directory for generated MRV JSONs and CSVs.
 
-If you face further issues, please open an issue or contact the main
+## Integration
 
+To use this in your own project:
 
-### Now just run the code in Examples files using the wrapper
+```python
+from greenmrv import mrv_run
 
-## The wrapper prints:
-
-# ```MRV ID```
-# ```MRV JSON file path```
-# ```CodeCarbon CSV path```
-
-## Example run
-Run the included demo:
-python examples/demo_train.py
-
+# Wrap your training code
+with mrv_run(
+    experiment_name="my_model_v1",
+    framework="PyTorch",  # Optional: auto-detected if omitted
+    epochs=10
+):
+    # Your actual training loop here
+    train_model()
+```

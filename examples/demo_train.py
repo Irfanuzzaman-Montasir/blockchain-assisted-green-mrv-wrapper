@@ -10,7 +10,7 @@ with mrv_run(
     model_name="ResNet18",
     dataset_name="CIFAR-10",
     # Leave framework auto OR set it; auto is fine
-    # framework="auto",
+    #framework="auto",
     epochs=90,
     batch_size=128
 ):

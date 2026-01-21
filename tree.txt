@@ -1,0 +1,24 @@
+examples/
+├── demo_train.py
+└── tiny_train.py
+
+mrv_records/
+├── MRV-2e236e4b-06e7-4241-ae5f-b21293671f14.json
+├── MRV-2e236e4b-06e7-4241-ae5f-b21293671f14_codecarbon.csv
+├── MRV-353e752b-8e93-41e3-8b2c-1b7d32d0c031.json
+└── MRV-353e752b-8e93-41e3-8b2c-1b7d32d0c031_codecarbon.csv
+
+src/
+├── greenmrv/
+│   ├── __init__.py
+│   ├── codecarbon_csv.py
+│   ├── core.py
+│   ├── framework.py
+│   ├── hardware.py
+│   └── schema.py
+└── greenmrv.egg-info/
+    ├── PKG-INFO
+    ├── SOURCES.txt
+    ├── dependency_links.txt
+    ├── requires.txt
+    └── top_level.txt

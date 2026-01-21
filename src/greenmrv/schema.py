@@ -51,7 +51,7 @@ def build_mrv_json(
             "end_time": end_time
         },
 
-        # Keep integrity block now so later upgrades won't break schema
+        # for 2nd update , blockchain info etc.
         "integrity": {
             "hash_alg": "sha256",
             "json_canonicalization": "sort_keys=true, separators=(',',':')",
